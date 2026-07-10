@@ -1,0 +1,26 @@
+{% load i18n %}
+<details data-filter-title="{{ title }}" open>
+  <summary>{% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}</summary>
+  {% for choice in choices %}
+    <form method="get">
+      {% for key, value in choice.hidden_parameters %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}">
+      {% endfor %}
+      <ul>
+        <li>
+          <label for="cashflow-date-from">С</label>
+          <input id="cashflow-date-from" type="date" name="{{ spec.lookup_kwarg_from }}" value="{{ choice.from_value }}">
+        </li>
+        <li>
+          <label for="cashflow-date-to">По</label>
+          <input id="cashflow-date-to" type="date" name="{{ spec.lookup_kwarg_to }}" value="{{ choice.to_value }}">
+        </li>
+        <li><button class="button" type="submit">Применить</button></li>
+        {% if choice.from_value or choice.to_value %}
+          <li><a href="{{ choice.reset_query|iriencode }}">Сбросить период</a></li>
+        {% endif %}
+      </ul>
+    </form>
+  {% endfor %}
+</details>
+
