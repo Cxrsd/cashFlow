@@ -10,11 +10,14 @@ SECRET_KEY = os.environ.get(
 )
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "testserver"]
-# Render проставляет хост сам, секретов здесь нет
-RENDER_EXTERNAL_HOSTNAME = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    CSRF_TRUSTED_ORIGINS = [f"https://{RENDER_EXTERNAL_HOSTNAME}"]
+# внешний хост демо: Render проставляет RENDER_EXTERNAL_HOSTNAME сам,
+# на других хостингах домен задается через DJANGO_ALLOWED_HOST
+EXTERNAL_HOST = os.environ.get("DJANGO_ALLOWED_HOST") or os.environ.get(
+    "RENDER_EXTERNAL_HOSTNAME"
+)
+if EXTERNAL_HOST:
+    ALLOWED_HOSTS.append(EXTERNAL_HOST)
+    CSRF_TRUSTED_ORIGINS = [f"https://{EXTERNAL_HOST}"]
 
 
 INSTALLED_APPS = [
@@ -61,7 +64,8 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        # на хостинге с постоянным диском базу можно унести из репозитория
+        "NAME": os.environ.get("DJANGO_SQLITE_PATH", BASE_DIR / "db.sqlite3"),
     }
 }
 
